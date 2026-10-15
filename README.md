@@ -2,7 +2,7 @@
 
 Une bibliothèque prête des tomes de mangas à ses lecteurs. La base gère les séries, les tomes, les lecteurs et les emprunts, et fait respecter une règle : **trois emprunts en cours au maximum par lecteur** (et un tome déjà emprunté ne s'emprunte pas).
 
-**Groupe** : _à compléter (prénom et nom de chaque membre)_
+**Groupe** : Elif Yakut, Antoine Masouh, Paul Bourdareau Launay, Ersanios
 
 ## Le modèle
 
