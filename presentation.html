@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bibliothèque de mangas – oral SQL</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0E1118;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;visibility:hidden}
+.slide.on{visibility:visible}
+table{border-collapse:collapse;width:100%} th,td{border-bottom:1px solid #D9D4C8;padding:.35em .6em;text-align:left;vertical-align:top} th{font-weight:600}
+ul,ol{padding-left:1.2em}
+aside{display:none}
+body.notes .slide.on aside{display:block;position:absolute;left:0;right:0;bottom:0;background:#000c;color:#fff;font:24px/1.4 'IBM Plex Sans',sans-serif;padding:24px 48px}
+#hint{position:fixed;right:12px;bottom:8px;color:#6a7179;font:13px sans-serif}
+</style></head><body>
+<div id="stage">
+<section class="slide" id="cover" data-transition="fade" style="background:#171B26;color:#F6F4EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F3875A;letter-spacing:2px">SQL AVANCÉ · BACHELOR 2 · POSTGRESQL</p>
+<div style="display:flex;flex-direction:column;gap:32px">
+<h1 style="font-size:120px;font-weight:700;line-height:1.05;color:#F6F4EF">Bibliothèque<br>de mangas</h1>
+<p style="font-size:44px;color:#C9CCD3;line-height:1.3">Trois emprunts en cours au maximum, et c’est la base qui le garantit.</p>
+</div>
+<div style="display:flex;gap:64px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:8px;flex:1">
+<p style="font-size:24px;color:#9AA0AC;text-transform:uppercase;letter-spacing:2px">Le groupe</p>
+<p style="font-size:32px;color:#F6F4EF">[Prénom Nom] · [Prénom Nom] · [Prénom Nom] · [Prénom Nom]</p>
+</div>
+<p style="font-size:28px;color:#9AA0AC;text-align:right">Jeudi 15 octobre 2026</p>
+</div>
+<aside>Présenter le groupe en une phrase chacun, puis le sujet : une bibliothèque qui prête des tomes de mangas. La règle à faire respecter : trois emprunts en cours au maximum par lecteur. Remplacer les crochets par les prénoms et noms du groupe.</aside>
+</section>
+
+<section class="slide" id="modele" data-transition="fade" style="background:#F6F4EF;color:#171B26;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C4441A;letter-spacing:2px">LE MODÈLE</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Quatre tables, une seule a du volume</h2>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:2px solid #D9D4C8;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;font-weight:600">series</p>
+<p style="font-size:56px;font-weight:700;color:#171B26">12</p>
+<p style="font-size:24px;color:#4F5664">titre, auteur, genre</p>
+</div>
+<p style="font-size:56px;color:#9AA0AC">←</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:2px solid #D9D4C8;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;font-weight:600">tomes</p>
+<p style="font-size:56px;font-weight:700;color:#171B26">240</p>
+<p style="font-size:24px;color:#4F5664">20 tomes par série</p>
+</div>
+<p style="font-size:56px;color:#9AA0AC">←</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#171B26;border:2px solid #171B26;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#F3875A">emprunts</p>
+<p style="font-size:56px;font-weight:700;color:#F6F4EF">200 005</p>
+<p style="font-size:24px;color:#C9CCD3">rendu_le vide = en cours</p>
+</div>
+<p style="font-size:56px;color:#9AA0AC">→</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:2px solid #D9D4C8;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;font-weight:600">lecteurs</p>
+<p style="font-size:56px;font-weight:700;color:#171B26">2 000</p>
+<p style="font-size:24px;color:#4F5664">avec e-mail et téléphone</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-left:6px solid #2A5D9F;padding:8px 32px">
+<p style="font-size:32px;font-weight:600">Le bibliothécaire · <span style="color:#2A5D9F">lea</span></p>
+<p style="font-size:28px;color:#4F5664">Le travail courant : il prête et reprend les tomes au comptoir.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-left:6px solid #C4441A;padding:8px 32px">
+<p style="font-size:32px;font-weight:600">Le gérant · <span style="color:#C4441A">marc</span></p>
+<p style="font-size:28px;color:#4F5664">Il suit la popularité des séries, sans rien modifier.</p>
+</div>
+</div>
+<aside>Les flèches suivent les clés étrangères : tomes pointe vers series, emprunts pointe vers tomes et vers lecteurs. La seule table volumineuse est emprunts : 200 000 emprunts rendus générés avec generate_series sur 600 jours, plus 5 emprunts en cours tapés à la main pour la démo. Inès (lecteur 1) en a déjà 3 : elle est au maximum. Deux profils choisis dès le départ : quelqu’un qui fait le travail courant, quelqu’un qui contrôle sans modifier.</aside>
+</section>
+
+<section class="slide" id="contenu" data-transition="fade" style="background:#F6F4EF;color:#171B26;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C4441A;letter-spacing:2px">CE QUE LA BASE CONTIENT</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Chaque notion du cours, appliquée</h2>
+</div>
+<table style="font-size:26px;color:#171B26;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr style="background:#ECE8DF"><th style="width:16%">Élément</th><th style="width:36%">Dans notre base</th><th style="width:48%">Ce qu’il fait</th></tr>
+<tr><td>Fonction</td><td>emprunts_en_cours(lecteur)</td><td>Compte les emprunts pas encore rendus</td></tr>
+<tr><td>Procédure</td><td>rendre(emprunt)</td><td>Enregistre un retour, refuse un emprunt inconnu ou déjà rendu</td></tr>
+<tr><td>Trigger</td><td>emprunts_refuser_emprunt</td><td>Avant chaque emprunt : 3 en cours au maximum, pas de tome déjà sorti</td></tr>
+<tr><td>Vues</td><td>emprunts_comptoir, stats_series</td><td>Une par rôle ; le rôle lit sa vue, pas les tables</td></tr>
+<tr><td>Rôles</td><td>bibliothecaire, gerant</td><td>Rôles-métiers NOLOGIN ; lea et marc en héritent</td></tr>
+<tr><td>Index</td><td>lecteur_id, emprunte_le</td><td>Mesurés avant et après avec EXPLAIN ANALYZE</td></tr>
+</table>
+<p style="position:absolute;left:128px;right:128px;bottom:64px;font-size:24px;color:#4F5664">Grille : rôles 5 · vues 4 · index 4 · fonctions, procédures, triggers 5 · qualité du script 2</p>
+<aside>Tout est dans projet.sql, dans l’ordre demandé : tables, données, fonction et procédure, trigger, vues, rôles, index. Le script s’exécute sans erreur sur une base vide. Le README donne pour chaque élément ce qu’il fait, pourquoi il est là et la preuve. La démo qui suit prend les quatre notions dans l’ordre de la trame imposée.</aside>
+</section>
+
+<section class="slide" id="demo-role" data-transition="fade" style="background:#F6F4EF;color:#171B26;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C4441A;letter-spacing:2px">DÉMO 1 / 4 · UN RÔLE</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">SET ROLE : une action permise, une refusée</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:160px;font-size:28px;font-weight:600;color:#2A5D9F">lea</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#171B26;border-radius:12px;padding:20px 28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#E9E6DF">SELECT * FROM emprunts_comptoir;</p>
+<p style="font-size:24px;color:#9AA0AC">Les 5 emprunts en cours</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;color:#2A5D9F">Autorisé</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:160px;font-size:28px;font-weight:600;color:#2A5D9F">lea</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#171B26;border-radius:12px;padding:20px 28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#E9E6DF">SELECT email, telephone FROM lecteurs WHERE id = 1;</p>
+<p style="font-size:24px;color:#F3875A">permission denied for table lecteurs</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;color:#C4441A">Refusé</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:160px;font-size:28px;font-weight:600;color:#C4441A">marc</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#171B26;border-radius:12px;padding:20px 28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#E9E6DF">SELECT * FROM stats_series ORDER BY emprunts DESC;</p>
+<p style="font-size:24px;color:#9AA0AC">Les 12 séries et leur popularité</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;color:#2A5D9F">Autorisé</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:160px;font-size:28px;font-weight:600;color:#C4441A">marc</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#171B26;border-radius:12px;padding:20px 28px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#E9E6DF">INSERT INTO emprunts (lecteur_id, tome_id) VALUES (5, 100);</p>
+<p style="font-size:24px;color:#F3875A">permission denied for table emprunts</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;color:#C4441A">Refusé</p>
+</div>
+</div>
+<aside>Requêtes dans la partie 1 de demo.sql. SET ROLE lea, puis RESET ROLE ; SET ROLE marc, puis RESET ROLE. À dire : les droits sont donnés aux rôles-métiers bibliothecaire et gerant, pas aux personnes. lea et marc héritent de leur rôle. Le bibliothécaire peut insérer un emprunt et mettre à jour la seule colonne rendu_le ; il n’a aucun droit sur lecteurs, series ni tomes. Le gérant ne lit que sa vue. On peut aussi montrer que marc ne lit pas emprunts_comptoir : permission denied for view emprunts_comptoir.</aside>
+</section>
+
+<section class="slide" id="demo-vue" data-transition="fade" style="background:#F6F4EF;color:#171B26;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C4441A;letter-spacing:2px">DÉMO 2 / 4 · UNE VUE</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Ce que la vue montre, et ce qu’elle cache</h2>
+</div>
+<div style="display:flex;gap:32px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:2px solid #D9D4C8;border-top:8px solid #2A5D9F;border-radius:16px;padding:40px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600">emprunts_comptoir</p>
+<p style="font-size:26px;color:#4F5664">Pour le bibliothécaire : les emprunts en cours, avec trois jointures déjà faites.</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;font-weight:600;color:#2A5D9F;text-transform:uppercase;letter-spacing:1px">Montre</p>
+<p style="font-size:28px">« Inès L. », la série, le n° du tome, les jours écoulés, en retard après 21 jours</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;font-weight:600;color:#C4441A;text-transform:uppercase;letter-spacing:1px">Cache</p>
+<p style="font-size:28px">Le nom complet, l’e-mail, le téléphone, la ville et les emprunts rendus</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:2px solid #D9D4C8;border-top:8px solid #C4441A;border-radius:16px;padding:40px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600">stats_series</p>
+<p style="font-size:26px;color:#4F5664">Pour le gérant : une CTE et une fonction de fenêtre pour la part de chaque série.</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;font-weight:600;color:#2A5D9F;text-transform:uppercase;letter-spacing:1px">Montre</p>
+<p style="font-size:28px">Par série : emprunts, part du total en %, en cours, durée moyenne</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;font-weight:600;color:#C4441A;text-transform:uppercase;letter-spacing:1px">Cache</p>
+<p style="font-size:28px">Toute donnée personnelle et tout emprunt individuel</p>
+</div>
+</div>
+</div>
+<aside>Partie 2 de demo.sql. D’abord, sans rôle : SELECT * FROM lecteurs WHERE id = 1 montre tout (nom, e-mail, téléphone, ville). Puis SET ROLE lea et SELECT lecteur, serie, tome, jours, en_retard FROM emprunts_comptoir WHERE lecteur_id = 1 : Léa ne voit que « Inès L. ». La vue cache la complexité (trois jointures et le filtre sur rendu_le) et protège les données personnelles. Le rôle a le droit sur sa vue, pas sur les tables.</aside>
+</section>
+
+<section class="slide" id="demo-index" data-transition="fade" style="background:#F6F4EF;color:#171B26;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C4441A;letter-spacing:2px">DÉMO 3 / 4 · UN INDEX</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Du Seq Scan à l’index, sur 200 005 lignes</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:2px solid #D9D4C8;border-radius:16px;padding:40px">
+<p style="font-size:32px;font-weight:600">L’historique d’un lecteur</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4F5664">WHERE lecteur_id = 1234</p>
+<div style="display:flex;gap:48px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-size:24px;color:#4F5664">Avant</p>
+<p style="font-size:72px;font-weight:700;color:#9AA0AC;line-height:1">3,7 ms</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-size:24px;color:#4F5664">Après</p>
+<p style="font-size:72px;font-weight:700;color:#C4441A;line-height:1">0,09 ms</p>
+</div>
+</div>
+<p style="font-size:28px">Environ <b>40 fois</b> plus rapide. La clé étrangère n’est pas indexée d’office, et le trigger s’en sert.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:2px solid #D9D4C8;border-radius:16px;padding:40px">
+<p style="font-size:32px;font-weight:600">Les emprunts d’une journée</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4F5664">WHERE emprunte_le du 3 mars 2026</p>
+<div style="display:flex;gap:48px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-size:24px;color:#4F5664">Avant</p>
+<p style="font-size:72px;font-weight:700;color:#9AA0AC;line-height:1">3,4 ms</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-size:24px;color:#4F5664">Après</p>
+<p style="font-size:72px;font-weight:700;color:#C4441A;line-height:1">0,18 ms</p>
+</div>
+</div>
+<p style="font-size:28px">Environ <b>19 fois</b> plus rapide. Une journée, c’est 333 lignes sur 200 000.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;right:128px;bottom:64px;font-size:24px;color:#4F5664">EXPLAIN ANALYZE, seconde exécution retenue. Les temps varient selon la machine ; l’écart et le plan comptent.</p>
+<aside>Partie 3 de demo.sql : DROP INDEX, EXPLAIN ANALYZE (Seq Scan), CREATE INDEX, EXPLAIN ANALYZE (Bitmap Index Scan). Lancer chaque EXPLAIN ANALYZE deux fois et lire la seconde mesure. Les chiffres de la diapo sont ceux du README ; ceux du direct seront un peu différents, ce qui compte c’est le changement de plan et l’écart. Avant l’index, PostgreSQL lit 199 905 lignes pour rien.</aside>
+</section>
+
+<section class="slide" id="demo-trigger" data-transition="fade" style="background:#F6F4EF;color:#171B26;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C4441A;letter-spacing:2px">DÉMO 4 / 4 · UN TRIGGER, EN TANT QUE LEA</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Inès a déjà trois tomes : la base dit non</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:940px;background:#171B26;border-radius:12px;padding:16px 24px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#E9E6DF">INSERT INTO emprunts (lecteur_id, tome_id) VALUES (1, 100);</p>
+<p style="flex:1;font-size:26px"><b style="color:#C4441A">Refusé</b> : lecteur 1, déjà 3 emprunts en cours</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:940px;background:#171B26;border-radius:12px;padding:16px 24px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#E9E6DF">INSERT INTO emprunts (lecteur_id, tome_id) VALUES (5, 1);</p>
+<p style="flex:1;font-size:26px"><b style="color:#C4441A">Refusé</b> : tome 1 déjà emprunté, pas rendu</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:940px;background:#171B26;border-radius:12px;padding:16px 24px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#E9E6DF">INSERT INTO emprunts (lecteur_id, tome_id) VALUES (5, 100);</p>
+<p style="flex:1;font-size:26px"><b style="color:#2A5D9F">Passe</b></p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:940px;background:#171B26;border-radius:12px;padding:16px 24px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#E9E6DF">CALL rendre(200001);</p>
+<p style="flex:1;font-size:26px"><b style="color:#2A5D9F">Passe</b> : Inès rend un tome</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:940px;background:#171B26;border-radius:12px;padding:16px 24px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#E9E6DF">INSERT INTO emprunts (lecteur_id, tome_id) VALUES (1, 101);</p>
+<p style="flex:1;font-size:26px"><b style="color:#2A5D9F">Passe</b> maintenant</p>
+</div>
+</div>
+<p style="font-size:30px;color:#4F5664;border-left:6px solid #C4441A;padding:4px 28px">Pourquoi dans la base : la règle tient par tous les chemins, le comptoir, un futur site ou une requête tapée à la main.</p>
+<aside>Partie 4 de demo.sql, en tant que lea : la règle tient aussi pour elle. Le trigger emprunts_refuser_emprunt est BEFORE INSERT FOR EACH ROW ; il appelle la fonction emprunts_en_cours. Ensuite la procédure rendre : CALL rendre(200001) passe, Inès peut emprunter à nouveau. Relancer CALL rendre(200001) affiche « Emprunt 200001 déjà rendu », et CALL rendre(999999) affiche « Emprunt 999999 inconnu ».</aside>
+</section>
+
+<section class="slide" id="questions" data-transition="fade" style="background:#171B26;color:#F6F4EF;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F3875A;letter-spacing:2px">QUESTIONS</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#F6F4EF">Ce qu’on peut nous demander</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#232836;border-radius:16px;padding:32px">
+<h3 style="font-size:28px;font-weight:600;color:#F3875A;line-height:1.2">Fonction ou procédure ?</h3>
+<p style="font-size:24px;color:#C9CCD3;line-height:1.35">La fonction calcule et renvoie un nombre. La procédure agit, avec CALL, et refuse avec un message.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#232836;border-radius:16px;padding:32px">
+<h3 style="font-size:28px;font-weight:600;color:#F3875A;line-height:1.2">Pourquoi des rôles NOLOGIN ?</h3>
+<p style="font-size:24px;color:#C9CCD3;line-height:1.35">Les droits vont au métier. Si Léa part, on supprime lea sans toucher aux droits du bibliothécaire.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#232836;border-radius:16px;padding:32px">
+<h3 style="font-size:28px;font-weight:600;color:#F3875A;line-height:1.2">Pourquoi lea lit 4 colonnes d’emprunts ?</h3>
+<p style="font-size:24px;color:#C9CCD3;line-height:1.35">Le trigger et la procédure s’exécutent avec ses droits. Aucune de ces colonnes n’est personnelle.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#232836;border-radius:16px;padding:32px">
+<h3 style="font-size:28px;font-weight:600;color:#F3875A;line-height:1.2">Pourquoi indexer lecteur_id ?</h3>
+<p style="font-size:24px;color:#C9CCD3;line-height:1.35">PostgreSQL n’indexe pas les clés étrangères, et le trigger compte les emprunts du lecteur à chaque insertion.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#232836;border-radius:16px;padding:32px">
+<h3 style="font-size:28px;font-weight:600;color:#F3875A;line-height:1.2">Pourquoi pas dans l’application ?</h3>
+<p style="font-size:24px;color:#C9CCD3;line-height:1.35">Dans la base, personne ne peut oublier la règle ni la contourner, même en écrivant dans la table.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#232836;border-radius:16px;padding:32px">
+<h3 style="font-size:28px;font-weight:600;color:#F3875A;line-height:1.2">D’où viennent 200 000 lignes ?</h3>
+<p style="font-size:24px;color:#C9CCD3;line-height:1.35">generate_series, avec chaque colonne calculée à partir du numéro i : lecteur, tome, date.</p>
+</div>
+</div>
+<aside>L’enseignant interroge un membre au hasard : chacun doit pouvoir répondre à ces six questions. Le dépôt : github.com/PaulEnBon/sql-bibliotheque-mangas (projet.sql, README.md, demo.sql).</aside>
+</section>
+
+</div>
+<div id="hint">← → pour changer de diapo · N : notes · F : plein écran</div>
+<script>
+const S=[...document.querySelectorAll('.slide')];let i=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
+function show(){S.forEach((s,k)=>s.classList.toggle('on',k===i));location.hash=i+1;}
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);document.getElementById('stage').style.transform=`translate(-50%,-50%) scale(${k})`;}
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))i=Math.min(S.length-1,i+1);else if(['ArrowLeft','PageUp'].includes(e.key))i=Math.max(0,i-1);else if(e.key=='n'||e.key=='N')document.body.classList.toggle('notes');else if(e.key=='f'||e.key=='F')document.documentElement.requestFullscreen?.();else return;show();});
+addEventListener('click',e=>{i=e.clientX>innerWidth/2?Math.min(S.length-1,i+1):Math.max(0,i-1);show();});
+addEventListener('hashchange',()=>{const n=parseInt(location.hash.slice(1));if(n&&n-1!==i){i=Math.max(0,Math.min(S.length-1,n-1));show();}});addEventListener('resize',fit);fit();show();
+</script></body></html>

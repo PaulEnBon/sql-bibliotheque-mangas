@@ -31,6 +31,8 @@ docker compose exec db psql -U festival -d projet -f /tmp/projet.sql
 
 Au deuxième passage, `CREATE ROLE` affiche `already exists` : les rôles existent pour tout le serveur, c'est sans gravité. Les requêtes de la démo sont dans [demo.sql](demo.sql).
 
+Le support de l'oral est dans [presentation.html](presentation.html) : ouvrez-le dans un navigateur (flèches pour changer de diapo, N pour les notes, F pour le plein écran).
+
 ---
 
 ## La fonction : `emprunts_en_cours(lecteur)`
